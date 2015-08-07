@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>D3: A flexible, scalable bar chart</title>
+		<script type="text/javascript" src="/js/d3/d3.js"></script>
+		<style type="text/css">
+		</style>
+	</head>
+	<body>
+    <p>Click on this text to update the chart with new data values (once).</p>
+		<script type="text/javascript">
+
+			//Width and height
+			var w = 300;
+			var h = 350;
+			
+			var dataset = [ 5, 10, 20, 45, 6, 25 ];
+
+      var pie = d3.layout.pie();
+
+      var outerRadius = w / 2;
+      var innerRadius = 0;
+      var arc = d3.svg.arc()
+                      .innerRadius(innerRadius)
+                      .outerRadius(outerRadius);
+
+
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+      var arcs = svg.selectAll("g.arc")
+                    .data(pie(dataset))
+                    .enter()
+                    .append("g")
+                    .attr("class", "arc")
+                    .attr("transform", "translate(" + outerRadius + ", " + outerRadius + ")");
+
+      arcs.append("path")
+        .attr("fill", function(d, i) {
+            console.log(i);
+            return d3.scale.category10()(i);
+        })
+        .attr("d", arc);
+
+			
+		</script>
+	</body>
+</html>

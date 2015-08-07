@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Saskatoon Crime</title>
+		<script type="text/javascript" src="/js/d3/d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+			// Width and height
+			var width = 960;
+			var height = 800;
+
+      // Scale that returns a color value given input
+      var color = d3.scale.quantize()
+                          .range(["rgb(237, 248, 233)",
+                                  "rgb(186, 228, 179)",
+                                  "rgb(116, 196, 118)",
+                                  "rgb(49, 163, 84)",
+                                  "rgb(0, 109, 44)"]);
+
+  
+
+      // Create SVG element
+      var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+          d3.json("saskatoon-geo.json", function(json) {
+            // Center the map: http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
+            var projection = d3.geo.albers().scale(1).translate([0, 0]);
+
+            var path = d3.geo.path().projection(projection);
+
+            var b = path.bounds(json);  // Compute the bounds of the feature
+            var s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);  // Compute scale by comparing aspect ratio
+            var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];  // Translate to center of bouding box
+
+            // Update projection using correct scale and translation
+            projection.scale(s).translate(t);
+
+            // Create GeoJSON path
+            svg.selectAll("path")
+              .data(json.features)
+              .enter()
+              .append("path")
+              .attr("d", path);
+          });
+		</script>
+	</body>
+</html>
+
