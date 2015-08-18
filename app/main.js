@@ -1,12 +1,13 @@
 define(function(require) {
   var d3 = require('d3');
   var queue = require('queue');
+  var colorbrewer = require('colorbrewer');
 
-  var width = 960;
+  var width = 880;
   var height = 800;
 
   // Create SVG element
-  var svg = d3.select("body")
+  var svg = d3.select("#map")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -30,16 +31,9 @@ define(function(require) {
     // Update projection using correct scale and translation
     projection.scale(s).translate(t);
 
-    // Create the map
-    svg.selectAll("path")
-       .data(geojson.features)
-       .enter()
-       .append("path")
-       .attr("d", path);
 
     // Merge crime data with GeoJSON data
-    // Value of the GeoJSON property will hold an array of Year, Crimes,
-    // Neighbourhood
+    // Value of the GeoJSON property will hold an array of Year/Crimes,
     for (var i = 0; i < geojson.features.length; i++) {
       geojson.features[i].properties.Value = [];
       for (var j = 0; j < data.length; j++) {
@@ -55,5 +49,43 @@ define(function(require) {
         }
       }
     }
+
+    // Quantize scale
+    var quantize = d3.scale.quantize()
+        .domain([0, 2000])  // TODO: Use max of actual dataset for that year. Probably recalculate each time
+        .range(colorbrewer.Blues[9]);
+
+    // Create the map
+    // TODO: Change year with slider
+    // Call this as a function on each update
+    // Call this when starting
+    var year = 2012;
+    svg.selectAll("path")
+       .data(geojson.features)
+       .enter()
+       .append("path")
+       .attr("d", path)
+       .style("fill", function(d) {
+         var crimesYear = d.properties.Value.filter(function(x) { return x.year == year; } );
+         var numCrimes = crimesYear.map(function(x) { return x.crimes; } );
+         return quantize(d3.sum(numCrimes));
+       });
+
+    // TODO: Show/hide labels (on mouseover?)
+    svg.selectAll("text")
+       .data(geojson.features)
+       .enter()
+       .append("text")
+       .text(function(d) {
+         return d.properties.Name;
+       })
+       .attr("x", function(d) {
+         return path.centroid(d)[0];
+       })
+       .attr("y", function(d) {
+         return path.centroid(d)[1];
+       })
+       .attr("text-anchor", "middle")
+       .attr("font-size", "6pt");
   }
 });
