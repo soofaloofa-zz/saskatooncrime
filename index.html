@@ -7,6 +7,7 @@
 
 		<title>Where's the crime in Saskatoon?</title>
     <link rel="stylesheet" href="/lib/material.min.css">
+    <link rel="stylesheet" href="/lib/d3.slider.css" />  
     <link rel="stylesheet" href="/app/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
@@ -24,7 +25,7 @@
             </header>
             <div class="mdl-card mdl-cell mdl-cell--9-col-desktop mdl-cell--6-col-tablet mdl-cell--4-col-phone">
               <div class="mdl-card__supporting-text">
-                <h4>Where's the Crime in Saskatoon?</h4>
+                <h4>Where's the crime in Saskatoon?</h4>
                 Dolore ex deserunt aute fugiat aute nulla ea sunt aliqua nisi cupidatat eu. Nostrud in laboris labore nisi amet do dolor eu fugiat consectetur elit cillum esse.
               </div>
               <div class="mdl-card__actions">
@@ -44,7 +45,7 @@
             <div class="mdl-card mdl-cell mdl-cell--12-col">
               <div class="mdl-card__supporting-text mdl-grid mdl-grid--no-spacing">
                 <div class="section__text mdl-cell mdl-cell--10-col-desktop mdl-cell--6-col-tablet mdl-cell--3-col-phone">
-                  <input class="mdl-slider mdl-js-slider" type="range" id="year-slider" min="2004" max="2012" value="2012" step="1" />
+                  <div id="year-slider"></div>
                   <!-- TODO: Display value of slider here -->
                   <div id="map"></div>
                 </div>

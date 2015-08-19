@@ -6,6 +6,7 @@ define(function(require) {
   var width = 880;
   var height = 800;
 
+  debugger;
   // Create SVG element
   var svg = d3.select("#map")
         .append("svg")
@@ -31,6 +32,12 @@ define(function(require) {
     // Update projection using correct scale and translation
     projection.scale(s).translate(t);
 
+    // Bind event listeners
+    // d3.select("#year-value")
+    //   .on("change", function() {
+    //     console.log('changed');
+
+    //   });
 
     // Merge crime data with GeoJSON data
     // Value of the GeoJSON property will hold an array of Year/Crimes,
