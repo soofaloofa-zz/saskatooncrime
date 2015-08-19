@@ -3,8 +3,8 @@ define(function(require) {
   var queue = require('queue');
   var colorbrewer = require('colorbrewer');
 
-  var width = 880;
-  var height = 800;
+  var width = 1100;
+  var height = 900;
   var startingYear = 2012;
 
   // Create SVG element
