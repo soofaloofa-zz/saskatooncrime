@@ -5,6 +5,7 @@ define(function(require) {
 
   var width = 880;
   var height = 800;
+  var startingYear = 2012;
 
   // Create SVG element
   var svg = d3.select("#map")
@@ -25,24 +26,6 @@ define(function(require) {
     .await(visualize);
 
   function visualize(error, geojson, data) {
-    // Center the map:
-    // http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
-    var b = path.bounds(geojson);  // Compute the bounds of the feature
-    var s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);  // Compute scale by comparing aspect ratio
-    var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];  // Translate to center of bouding box
-
-    // Update projection using correct scale and translation
-    projection.scale(s).translate(t);
-
-    // Display the initial paths
-    var neighbourhoods = svg.append("g").attr("id", "neighbourhood");
-
-    neighbourhoods.selectAll("path")
-        .data(geojson.features)
-        .enter()
-        .append("path")
-        .attr("d", path);
-
     // Calculate the max crimes for each year
     for (var i = 0; i < data.length; i++ ) {
       var dataYear = parseInt(data[i].Year.split("-")[0]);
@@ -67,46 +50,69 @@ define(function(require) {
       }
     }
 
+    // Center the map:
+    // http://stackoverflow.com/questions/14492284/center-a-map-in-d3-given-a-geojson-object
+    var b = path.bounds(geojson);  // Compute the bounds of the feature
+    var s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);  // Compute scale by comparing aspect ratio
+    var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];  // Translate to center of bouding box
+
+    // Update projection using correct scale and translation
+    projection.scale(s).translate(t);
+
+    var quantize = calculateQuantizeScale(startingYear);
+    
+    // Create the initial paths
+    var neighbourhoods = svg.append("g").attr("id", "neighbourhood");
+
+    // Display the initial values
+    neighbourhoods.selectAll("path")
+        .data(geojson.features)
+        .enter()
+        .append("path")
+        .attr("d", path)
+        .style("fill", function(d) {
+          return calculateFill(d, startingYear);
+        })
+        .style("fill-opacity", .7);
+
+
     // Bind an event listener for the current year
     d3.select("#year-slider").on("input", function() {
       update(+this.value);
     });
 
-    update(2012);
+    update(startingYear);
+
+    function calculateQuantizeScale(year) {
+      return d3.scale.quantize().domain([0, maxCrimes[year]]).range(colorbrewer.Blues[9]);
+    }
+
+    function calculateFill(d, year) {
+      var crimesYear = d.properties.Value.filter(function(x) { return x.year == year; } );
+      var numCrimes = crimesYear.map(function(x) { return x.crimes; } );
+      return quantize(d3.sum(numCrimes));
+    }
 
     function update(year) {
-      console.log(year);
+      var quantize = calculateQuantizeScale(year);
 
-      // Quantize scale
-      var quantize = d3.scale.quantize()
-          .domain([0, maxCrimes[year]])
-          .range(colorbrewer.Blues[9]);
+      d3.selectAll("#year-value")
+        .text(year);
 
       neighbourhoods.selectAll("path")
         .transition()
         .duration(1000)
         .style("fill", function(d) {
-          var crimesYear = d.properties.Value.filter(function(x) { return x.year == year; } );
-          var numCrimes = crimesYear.map(function(x) { return x.crimes; } );
-          return quantize(d3.sum(numCrimes));
+          return calculateFill(d, year);
         });
 
-      // TODO: Show/hide labels (on mouseover?)
-      // svg.selectAll("text")
-      //    .data(geojson.features)
-      //    .enter()
-      //    .append("text")
-      //    .text(function(d) {
-      //      return d.properties.Name;
-      //    })
-      //    .attr("x", function(d) {
-      //      return path.centroid(d)[0];
-      //    })
-      //    .attr("y", function(d) {
-      //      return path.centroid(d)[1];
-      //    })
-      //    .attr("text-anchor", "middle")
-      //    .attr("font-size", "6pt");
+      neighbourhoods.selectAll("path")
+        .on("mouseover", function() {
+          d3.select(this).style("fill-opacity", 1);
+        })
+        .on("mouseout", function(d) {
+          d3.select(this).style("fill-opacity", 0.7);
+        });
     }
   }
 });
