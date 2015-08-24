@@ -117,7 +117,7 @@ define(function(require) {
 
       neighbourhoods.selectAll("path")
         .transition()
-        .duration(1500)
+        .duration(500)
         .style("fill", function(d) {
           return calculateFill(d, year);
         });
