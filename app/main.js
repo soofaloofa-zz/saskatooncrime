@@ -1,5 +1,6 @@
 define(function(require) {
   var d3 = require('d3');
+  var d3tip = require('d3tip');
   var queue = require('queue');
   var colorbrewer = require('colorbrewer');
 
@@ -73,7 +74,8 @@ define(function(require) {
         .style("fill", function(d) {
           return calculateFill(d, startingYear);
         })
-        .style("fill-opacity", .7);
+        .style("fill-opacity", .7)
+        .style("stroke", '#aaa');
 
 
     // Bind an event listener for the current year
@@ -81,23 +83,37 @@ define(function(require) {
       update(+this.value);
     });
 
-    update(startingYear);
 
     function calculateQuantizeScale(year) {
       return d3.scale.quantize().domain([0, maxCrimes[year]]).range(colorbrewer.Blues[9]);
     }
 
-    function calculateFill(d, year) {
+    function currentCrimes(d, year) {
       var crimesYear = d.properties.Value.filter(function(x) { return x.year == year; } );
       var numCrimes = crimesYear.map(function(x) { return x.crimes; } );
-      return quantize(d3.sum(numCrimes));
+      return d3.sum(numCrimes);
     }
+
+    function calculateFill(d, year) {
+      return quantize(currentCrimes(d, year));
+    }
+
+    var tip = d3tip()
+      .attr('class', 'd3-tip')
+      .html(function(d, year) { 
+        return '<span>' + d.properties.Name + ':</span>' + '<br />' + '<span>' + currentCrimes(d, year) + ' Crimes </span>'
+      })
+      .offset([-12, 0])
+
+    update(startingYear);
 
     function update(year) {
       var quantize = calculateQuantizeScale(year);
 
       d3.selectAll("#year-value")
         .text(year);
+
+      neighbourhoods.call(tip);
 
       neighbourhoods.selectAll("path")
         .transition()
@@ -107,11 +123,13 @@ define(function(require) {
         });
 
       neighbourhoods.selectAll("path")
-        .on("mouseover", function() {
+        .on("mouseover", function(d) {
           d3.select(this).style("fill-opacity", 1);
+          tip.show(d, year);
         })
         .on("mouseout", function(d) {
           d3.select(this).style("fill-opacity", 0.7);
+          tip.hide(d, year);
         });
     }
   }
