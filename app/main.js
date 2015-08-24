@@ -4,8 +4,8 @@ define(function(require) {
   var queue = require('queue');
   var colorbrewer = require('colorbrewer');
 
-  var width = 1100;
-  var height = 900;
+  var width = 800;
+  var height = 800;
   var startingYear = 2012;
 
   // Create SVG element
@@ -117,7 +117,7 @@ define(function(require) {
 
       neighbourhoods.selectAll("path")
         .transition()
-        .duration(1000)
+        .duration(1500)
         .style("fill", function(d) {
           return calculateFill(d, year);
         });

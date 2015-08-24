@@ -40,6 +40,7 @@ html, body {
 .mdl-demo main > .mdl-layout__tab-panel {
   padding: 8px;
   padding-top: 48px;
+  padding-bottom: 48px;
 }
 .mdl-demo .mdl-card {
   height: auto;
@@ -99,7 +100,7 @@ html, body {
   margin-bottom: 48px;
 }
 .mdl-demo section.section--center {
-  max-width: 1200px;
+  max-width: 860px;
 }
 .mdl-demo #features section.section--center {
   max-width: 620px;
@@ -118,8 +119,9 @@ html, body {
       -ms-flex-pack: center;
           justify-content: center;
 }
-.mdl-demo section > .section__play-btn {
-  min-height: 200px;
+.mdl-demo section > .section__play-btn img {
+  height: 213px;
+  width: 215px;
 }
 .mdl-demo section > header > .material-icons {
   font-size: 3rem;
